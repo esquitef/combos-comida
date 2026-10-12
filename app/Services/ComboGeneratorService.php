@@ -25,6 +25,8 @@ class ComboGeneratorService
     private const BONUS_OBJETIVO = 5;
     private const BONUS_ESTILO = 5;
     private const BONUS_COMPATIBILIDAD = 10; // acompañamiento/bebida/postre del mismo estilo que el principal
+    /** Descuento al puntaje de un plato que ya se usó en otro día del plan semanal. */
+    private const PENALIZACION_REPETIDO = 30;
 
     /** En modo "Sorpréndeme" se elige al azar entre las N mejores opciones. */
     private const TOP_ALEATORIO = 3;
@@ -35,7 +37,9 @@ class ComboGeneratorService
      * Genera un combo completo.
      *
      * @param  int[]  $ingredientesIds  IDs de los ingredientes que el usuario tiene.
-     * @param  array  $preferencias     tiempo_max, presupuesto, style_id, objetivo, prioritarios (todas opcionales).
+     * @param  array  $preferencias     Todas opcionales: tiempo_max, presupuesto, style_id, objetivo,
+     *                                  prioritarios (IDs de ingredientes), excluir (IDs de platos que
+     *                                  no pueden salir) y penalizar (IDs de platos que bajan de puntaje).
      * @param  bool   $aleatorio        true = modo "Sorpréndeme".
      * @return array|null  null si no hay ningún principal viable.
      */
@@ -44,8 +48,8 @@ class ComboGeneratorService
         $prefs = $this->normalizarPreferencias($preferencias);
         $disponibles = array_flip(array_map('intval', $ingredientesIds));
 
-        // 1) Filtrar candidatos (filtro duro: tiempo) y 2) puntuar cada plato.
-        $puntuados = $this->platosCandidatos($prefs['tiempo_max'])
+        // 1) Filtrar candidatos (filtros duros: tiempo y exclusiones) y 2) puntuar cada plato.
+        $puntuados = $this->platosCandidatos($prefs['tiempo_max'], $prefs['excluir'])
             ->map(fn (Dish $d) => $this->puntuarPlato($d, $disponibles, $prefs));
 
         // 3) Elegir el plato principal.
@@ -99,14 +103,17 @@ class ComboGeneratorService
     }
 
     /**
-     * Guarda el combo generado (con su lista de compras) para el historial.
+     * Guarda el combo generado (con su lista de compras).
+     * Si forma parte de un plan semanal, se indica el plan y el día.
      */
-    public function guardar(array $resultado, string $sessionId): Combo
+    public function guardar(array $resultado, string $sessionId, ?int $planId = null, ?int $dia = null): Combo
     {
-        return DB::transaction(function () use ($resultado, $sessionId) {
+        return DB::transaction(function () use ($resultado, $sessionId, $planId, $dia) {
             $combo = Combo::create([
-                'session_id' => $sessionId,
-                'score'      => $resultado['score'],
+                'session_id'   => $sessionId,
+                'score'        => $resultado['score'],
+                'meal_plan_id' => $planId,
+                'dia'          => $dia,
             ]);
 
             foreach ($resultado['platos'] as $item) {
@@ -126,12 +133,13 @@ class ComboGeneratorService
     }
 
     /**
-     * Últimos combos generados por una sesión.
+     * Últimos combos individuales generados por una sesión (los de un plan semanal no cuentan).
      */
     public function historial(string $sessionId, int $cantidad = 5): Collection
     {
         return Combo::with('dishes')
             ->where('session_id', $sessionId)
+            ->whereNull('meal_plan_id')
             ->latest()
             ->take($cantidad)
             ->get();
@@ -151,13 +159,16 @@ class ComboGeneratorService
             'style_id'     => $lleno('style_id') ? (int) $p['style_id'] : null,
             'objetivo'     => $lleno('objetivo') ? $p['objetivo'] : null,
             'prioritarios' => array_map('intval', $p['prioritarios'] ?? []),
+            'excluir'      => array_map('intval', $p['excluir'] ?? []),
+            'penalizar'    => array_map('intval', $p['penalizar'] ?? []),
         ];
     }
 
-    private function platosCandidatos(?int $tiempoMax): Collection
+    private function platosCandidatos(?int $tiempoMax, array $excluir = []): Collection
     {
         return Dish::with(['ingredients', 'style'])
             ->when($tiempoMax, fn ($q) => $q->where('tiempo_preparacion_min', '<=', $tiempoMax))
+            ->when($excluir, fn ($q) => $q->whereNotIn('id', $excluir))
             ->get();
     }
 
@@ -194,11 +205,16 @@ class ComboGeneratorService
             $score += self::BONUS_ESTILO;
         }
 
+        // Plan semanal: un plato ya usado en otro día pierde puntos (pero no se descarta).
+        if (in_array($plato->id, $prefs['penalizar'])) {
+            $score -= self::PENALIZACION_REPETIDO;
+        }
+
         return [
             'dish'           => $plato,
             'tipo'           => $plato->tipo,
             'costo'          => (float) $plato->costo_aproximado,
-            'score'          => min(100, $score),
+            'score'          => min(100, max(0, $score)),
             'disponibilidad' => $dispEsenciales,
             'faltantes'      => $esenciales->reject($tengo)->values(),
         ];
