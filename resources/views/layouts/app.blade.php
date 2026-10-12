@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('titulo', 'Combos') · Generador de Combos de Comida</title>
+
     <style>
         :root{--naranja:#E85D24;--naranja-osc:#C24B18;--carbon:#2D2A26;--dorado:#FFB100;--crema:#F3EEE8;--gris:#6B6560;--borde:#E4DFD6}
         *{box-sizing:border-box}
@@ -74,6 +75,16 @@
 
         @media (max-width:600px){.resumen{grid-template-columns:1fr}}
         @media print{.top,.volver,.btn,.pie{display:none}}
+
+        .aviso{background:#FFF6DB;border-color:#F2D58A;color:#6B4A00}
+.dia-cab{display:flex;justify-content:space-between;align-items:baseline}
+.dia-cab a{color:var(--naranja-osc);text-decoration:none;font-size:.9rem}
+.dia-platos{list-style:none;padding:0;margin:0 0 8px}
+.dia-platos li{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;padding:6px 0;border-bottom:1px solid var(--borde)}
+.dia-platos .rol{min-width:120px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em}
+.dia-platos small{color:var(--gris)}
+.falta-tag{background:#FFF0CC;color:#8A5A00;border-radius:999px;padding:1px 10px;font-size:.8rem}
+.dia .meta{margin:8px 0 0}
     </style>
 </head>
 <body>

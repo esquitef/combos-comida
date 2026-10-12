@@ -86,8 +86,9 @@
         </section>
 
         <div class="acciones">
-            <button type="submit" name="sorprende" value="0" class="btn">Generar combo</button>
-            <button type="submit" name="sorprende" value="1" class="btn btn-alt">🎲 Sorpréndeme</button>
-        </div>
+    <button type="submit" name="sorprende" value="0" class="btn">Generar combo</button>
+    <button type="submit" name="sorprende" value="1" class="btn btn-alt">🎲 Sorpréndeme</button>
+    <button type="submit" formaction="{{ route('planes.generar') }}" class="btn btn-alt">📅 Plan de 5 días</button>
+</div>
     </form>
 @endsection

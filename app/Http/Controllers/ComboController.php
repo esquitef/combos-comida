@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Combo;
+use App\Models\MealPlan;
 use App\Models\Style;
 use App\Services\ComboGeneratorService;
 use Illuminate\Http\RedirectResponse;
@@ -125,18 +126,25 @@ class ComboController extends Controller
         ]);
     }
 
-    /** Últimos 5 combos generados en esta sesión. */
-    public function historial(Request $request): View
-    {
-        $combos = $this->servicio->historial($request->session()->getId(), 5)
-            ->map(fn ($combo) => [
-                'combo'  => $combo,
-                'platos' => $this->ordenarPlatos($combo->dishes),
-            ]);
+    /** Últimos 5 combos y últimos 5 planes generados en esta sesión. */
+public function historial(Request $request): View
+{
+    $sessionId = $request->session()->getId();
 
-        return view('combos.historial', ['combos' => $combos]);
-    }
+    $combos = $this->servicio->historial($sessionId, 5)
+        ->map(fn ($combo) => [
+            'combo'  => $combo,
+            'platos' => $this->ordenarPlatos($combo->dishes),
+        ]);
 
+    $planes = MealPlan::withCount('combos')
+        ->where('session_id', $sessionId)
+        ->latest()
+        ->take(5)
+        ->get();
+
+    return view('combos.historial', ['combos' => $combos, 'planes' => $planes]);
+}
     /** Ordena los platos de un combo: principal, acompañamiento, bebida, postre. */
     private function ordenarPlatos(Collection $platos): Collection
     {
