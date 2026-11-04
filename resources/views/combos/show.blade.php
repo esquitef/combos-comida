@@ -3,22 +3,39 @@
 @section('titulo', 'Tu combo')
 
 @section('contenido')
+    @php
+        $iconosRol = ['principal' => '🍽️', 'acompanamiento' => '🥗', 'bebida' => '🥤', 'postre' => '🍰'];
+    @endphp
+
     <a class="volver" href="{{ route('combos.index') }}">← Generar otro combo</a>
     <h1>Tu combo</h1>
+    <p class="sub">Esto es lo que mejor se adapta a lo que tienes y a tus preferencias.</p>
 
     <div class="resumen">
-        <div><span>Puntaje</span><strong>{{ number_format($combo->score, 0) }}/100</strong></div>
-        <div><span>Costo aproximado</span><strong>${{ number_format($costoTotal, 0) }}</strong></div>
-        <div><span>Tiempo total</span><strong>{{ $tiempoTotal }} min</strong></div>
+        <div class="dato">
+            <div class="anillo" style="--p: {{ min(100, max(0, (int) round($combo->score))) }}"><b>{{ number_format($combo->score, 0) }}</b></div>
+            <div><span>Puntaje</span><strong>de 100</strong></div>
+        </div>
+        <div class="dato">
+            <div class="dato-ico">💰</div>
+            <div><span>Costo aproximado</span><strong>${{ number_format($costoTotal, 0) }}</strong></div>
+        </div>
+        <div class="dato">
+            <div class="dato-ico">⏱️</div>
+            <div><span>Tiempo total</span><strong>{{ $tiempoTotal }} min</strong></div>
+        </div>
     </div>
 
     @foreach ($platos as $p)
-        @php $completo = $p['faltantes']->isEmpty(); @endphp
+        @php
+            $completo = $p['faltantes']->isEmpty();
+            $n = $p['faltantes']->count();
+        @endphp
         <article class="plato {{ $completo ? '' : 'plato-falta' }}">
             <div class="plato-cab">
-                <span class="rol">{{ $p['etiqueta'] }}</span>
+                <span class="rol">{{ $iconosRol[$p['dish']->pivot->rol] ?? '🍽️' }} {{ $p['etiqueta'] }}</span>
                 <span class="estado">
-                    {{ $completo ? '✓ Lo tienes todo' : 'Te falta ' . $p['faltantes']->count() . ' ingrediente(s)' }}
+                    {{ $completo ? '✓ Lo tienes todo' : ($n === 1 ? 'Te falta 1 ingrediente' : 'Te faltan ' . $n . ' ingredientes') }}
                 </span>
             </div>
             <h2>{{ $p['dish']->nombre }}</h2>
@@ -39,8 +56,8 @@
         </article>
     @endforeach
 
-    <section class="card">
-        <h2>Lista de compras</h2>
+    <section class="lista">
+        <h2>🛒 Lista de compras</h2>
         @if ($listaCompras->isEmpty())
             <p>No te falta nada: puedes preparar todo el combo con lo que ya tienes.</p>
         @else
@@ -49,13 +66,15 @@
                     <li>
                         <label>
                             <input type="checkbox">
-                            {{ $item['ingrediente']->nombre }}
-                            <small>— para {{ $item['platos']->implode(', ') }}</small>
+                            <span>
+                                <strong>{{ $item['ingrediente']->nombre }}</strong>
+                                <small>para {{ $item['platos']->implode(', ') }}</small>
+                            </span>
                         </label>
                     </li>
                 @endforeach
             </ul>
-            <button type="button" class="btn btn-alt" onclick="window.print()">Imprimir lista</button>
+            <button type="button" class="btn btn-out" onclick="window.print()">🖨️ Imprimir lista</button>
         @endif
     </section>
 @endsection

@@ -3,8 +3,29 @@
 @section('titulo', 'Generar combo')
 
 @section('contenido')
-    <h1>¿Qué cocinamos hoy?</h1>
-    <p class="sub">Marca los ingredientes que tienes, ajusta tus preferencias y arma un combo completo.</p>
+    @php
+        // Símbolo (emoji) de cada categoría; si una categoría no está aquí se usa el plato genérico.
+        $iconos = [
+            'Verduras' => '🥦',
+            'Chiles, hierbas y especias' => '🌶️',
+            'Carnes y aves' => '🍗',
+            'Pescados y mariscos' => '🐟',
+            'Huevos y lácteos' => '🥚',
+            'Pastas, cereales y panes' => '🍝',
+            'Legumbres y soya' => '🌱',
+            'Frutas' => '🍎',
+            'Frutos secos, semillas y flores' => '🥜',
+            'Condimentos y básicos' => '🧂',
+        ];
+    @endphp
+
+    <section class="hero">
+        <div>
+            <h1>¿Qué cocinamos hoy?</h1>
+            <p>Marca lo que ya tienes en casa, cuéntanos cuánto tiempo y presupuesto tienes, y armamos un combo completo con la lista de lo que te falta.</p>
+        </div>
+        <img src="{{ asset('img/logo.png') }}" alt="" width="132" height="132">
+    </section>
 
     @if ($errors->any())
         <div class="alerta">
@@ -20,15 +41,24 @@
         @csrf
 
         <section class="card">
-            <h2>1. Tus ingredientes</h2>
+            <div class="paso-cab">
+                <span class="num">1</span>
+                <h2>Tus ingredientes</h2>
+            </div>
             <p class="ayuda">
-                Toca un ingrediente para seleccionarlo. Al marcarlo aparece una ⭐: actívala en los que quieras
-                gastar primero (modo aprovechamiento).
+                Toca los ingredientes que tienes. Al marcar uno aparece una ⭐: actívala en los que quieras
+                gastar primero y los tomaremos en cuenta antes que los demás.
             </p>
 
             @foreach ($categorias as $categoria)
-                <fieldset>
-                    <legend>{{ $categoria->nombre }}</legend>
+                <fieldset class="cat">
+                    <legend class="cat-tit">
+                        <span class="cat-in">
+                            <span class="cat-ico">{{ $iconos[$categoria->nombre] ?? '🍽️' }}</span>
+                            {{ $categoria->nombre }}
+                            <small>{{ $categoria->ingredients->count() }}</small>
+                        </span>
+                    </legend>
                     <div class="chips">
                         @foreach ($categoria->ingredients as $ing)
                             <div class="chip">
@@ -50,9 +80,14 @@
         </section>
 
         <section class="card">
-            <h2>2. Tus preferencias <small>(opcionales)</small></h2>
+            <div class="paso-cab">
+                <span class="num">2</span>
+                <h2>Tus preferencias <span class="opcional">(opcionales)</span></h2>
+            </div>
+            <p class="ayuda">Si no eliges nada, buscamos la mejor opción con lo que marcaste.</p>
+
             <div class="grid-prefs">
-                <label>Tiempo máximo por plato
+                <label class="campo">⏱️ Tiempo máximo por plato
                     <select name="tiempo_max">
                         <option value="">Sin límite</option>
                         @foreach ([15, 30, 45, 60, 90] as $min)
@@ -61,11 +96,11 @@
                     </select>
                 </label>
 
-                <label>Presupuesto máximo del combo (MXN)
+                <label class="campo">💰 Presupuesto del combo (MXN)
                     <input type="number" name="presupuesto" min="1" step="1" placeholder="Ej. 150" value="{{ old('presupuesto') }}">
                 </label>
 
-                <label>Estilo gastronómico
+                <label class="campo">🌎 Estilo gastronómico
                     <select name="style_id">
                         <option value="">Cualquiera</option>
                         @foreach ($estilos as $estilo)
@@ -74,7 +109,7 @@
                     </select>
                 </label>
 
-                <label>Objetivo de la comida
+                <label class="campo">🎯 Objetivo de la comida
                     <select name="objetivo">
                         <option value="">Cualquiera</option>
                         @foreach ($objetivos as $valor => $texto)
@@ -86,9 +121,9 @@
         </section>
 
         <div class="acciones">
-    <button type="submit" name="sorprende" value="0" class="btn">Generar combo</button>
-    <button type="submit" name="sorprende" value="1" class="btn btn-alt">🎲 Sorpréndeme</button>
-    <button type="submit" formaction="{{ route('planes.generar') }}" class="btn btn-alt">📅 Plan de 5 días</button>
-</div>
+            <button type="submit" name="sorprende" value="0" class="btn btn-prim">Generar combo</button>
+            <button type="submit" name="sorprende" value="1" class="btn btn-sec">🎲 Sorpréndeme</button>
+            <button type="submit" formaction="{{ route('planes.generar') }}" class="btn btn-out">📅 Plan de 5 días</button>
+        </div>
     </form>
 @endsection
