@@ -4,7 +4,7 @@
 
 @section('contenido')
     @php
-        $iconosRol = ['principal' => '🍽️', 'acompanamiento' => '🥗', 'bebida' => '🥤', 'postre' => '🍰'];
+        $iconosRol = config('comibox.emoji_roles');
     @endphp
 
     <a class="volver" href="{{ route('combos.index') }}">← Generar otro combo</a>
@@ -30,8 +30,17 @@
         @php
             $completo = $p['faltantes']->isEmpty();
             $n = $p['faltantes']->count();
+            $foto = $p['dish']->foto_url;
         @endphp
         <article class="plato {{ $completo ? '' : 'plato-falta' }}">
+            @if ($foto)
+                <div class="plato-foto">
+                    <img src="{{ $foto }}" alt="{{ $p['dish']->nombre }}" width="168" height="126" loading="lazy">
+                </div>
+            @else
+                <div class="plato-foto plato-sin-foto" aria-hidden="true">{{ $iconosRol[$p['dish']->pivot->rol] ?? '🍽️' }}</div>
+            @endif
+            <div class="plato-cuerpo">
             <div class="plato-cab">
                 <span class="rol">{{ $iconosRol[$p['dish']->pivot->rol] ?? '🍽️' }} {{ $p['etiqueta'] }}</span>
                 <span class="estado">
@@ -53,6 +62,7 @@
                     <li class="opc">{{ $ing->nombre }} (opcional)</li>
                 @endforeach
             </ul>
+            </div>
         </article>
     @endforeach
 

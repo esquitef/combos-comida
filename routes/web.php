@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AcercaController;
 use App\Http\Controllers\ComboController;
 use App\Http\Controllers\PlanController;
 use Illuminate\Support\Facades\Route;
@@ -11,3 +12,5 @@ Route::get('/historial', [ComboController::class, 'historial'])->name('combos.hi
 
 Route::post('/planes', [PlanController::class, 'generar'])->name('planes.generar');
 Route::get('/planes/{plan}', [PlanController::class, 'show'])->name('planes.show');
+
+Route::get('/acerca', AcercaController::class)->name('acerca');

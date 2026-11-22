@@ -18,7 +18,12 @@
         <div class="seccion-tit"><h2>🍽️ Combos</h2></div>
         @foreach ($combos as $item)
             <a class="item" href="{{ route('combos.show', $item['combo']) }}">
-                <div class="item-ico">🍽️</div>
+                @php $foto = $item['platos']->first()?->foto_url; @endphp
+                @if ($foto)
+                    <img class="item-foto" src="{{ $foto }}" alt="" width="56" height="56" loading="lazy">
+                @else
+                    <div class="item-ico">🍽️</div>
+                @endif
                 <div class="item-txt">
                     <strong>{{ $item['platos']->pluck('nombre')->implode(' + ') }}</strong>
                     <small>{{ $item['combo']->created_at->format('d/m/Y H:i') }}</small>

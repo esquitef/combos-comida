@@ -4,19 +4,9 @@
 
 @section('contenido')
     @php
-        // Símbolo (emoji) de cada categoría; si una categoría no está aquí se usa el plato genérico.
-        $iconos = [
-            'Verduras' => '🥦',
-            'Chiles, hierbas y especias' => '🌶️',
-            'Carnes y aves' => '🍗',
-            'Pescados y mariscos' => '🐟',
-            'Huevos y lácteos' => '🥚',
-            'Pastas, cereales y panes' => '🍝',
-            'Legumbres y soya' => '🌱',
-            'Frutas' => '🍎',
-            'Frutos secos, semillas y flores' => '🥜',
-            'Condimentos y básicos' => '🧂',
-        ];
+        // Los símbolos están en config/comibox.php
+        $iconos = config('comibox.emoji_categorias');
+        $emojis = config('comibox.emoji_ingredientes');
     @endphp
 
     <section class="hero">
@@ -65,6 +55,9 @@
                                 <label class="chip-main">
                                     <input type="checkbox" class="sel" name="ingredientes[]" value="{{ $ing->id }}"
                                            @checked(in_array($ing->id, old('ingredientes', [])))>
+                                    @if (isset($emojis[$ing->nombre]))
+                                        <span class="chip-emo" aria-hidden="true">{{ $emojis[$ing->nombre] }}</span>
+                                    @endif
                                     <span>{{ $ing->nombre }}</span>
                                 </label>
                                 <label class="prio" title="Usar primero (modo aprovechamiento)">

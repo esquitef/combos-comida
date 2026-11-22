@@ -38,10 +38,10 @@
         .nombre{font-family:var(--f-titulo);font-weight:600;font-size:1.45rem;line-height:1;color:var(--v900)}
         .nombre b{font-weight:600;color:var(--v500)}
         .marca small{display:block;margin-top:3px;font-size:.78rem;color:var(--suave)}
-        nav{display:flex;gap:6px}
-        nav a{padding:8px 18px;border-radius:999px;text-decoration:none;font-weight:800;font-size:.95rem;color:var(--v900)}
-        nav a:hover{background:var(--v100)}
-        nav a.activo{background:var(--v700);color:#fff}
+        .top nav{display:flex;gap:6px}
+        .top nav a{padding:8px 18px;border-radius:999px;text-decoration:none;font-weight:800;font-size:.95rem;color:var(--v900)}
+        .top nav a:hover{background:var(--v100)}
+        .top nav a.activo{background:var(--v700);color:#fff}
 
         /* ---------- Tipografía y tarjetas ---------- */
         h1,h2,h3{font-family:var(--f-titulo);font-weight:600;color:var(--v900)}
@@ -173,10 +173,55 @@
         .falta-tag{flex:none;padding:2px 11px;border-radius:999px;background:var(--ambar-cl);color:var(--ambar-txt);font-size:.8rem;font-weight:800}
         .dia .meta{margin:8px 0 0}
 
-        .pie{padding:28px 20px 36px;text-align:center;font-size:.85rem;color:var(--suave)}
+        /* ---------- Fotos de platos ---------- */
+        .plato{display:flex;align-items:flex-start;gap:20px}
+        .plato-cuerpo{flex:1;min-width:0}
+        .plato-foto{flex:none;width:168px;overflow:hidden;border-radius:14px;background:var(--v100)}
+        .plato-foto img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover}
+        .plato-sin-foto{display:grid;place-items:center;height:126px;font-size:2.7rem;background:linear-gradient(135deg,var(--v100),var(--kraft-cl))}
+        .mini-foto{flex:none;width:52px;height:52px;border-radius:14px;object-fit:cover;background:var(--v100)}
+        .item-foto{flex:none;width:56px;height:56px;border-radius:15px;object-fit:cover;background:var(--v100)}
+        .chip-emo{font-size:1rem;line-height:1}
+
+        /* ---------- Acerca del proyecto ---------- */
+        .cifras{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0 4px}
+        .cifra{padding:14px 10px;border:1px solid var(--borde);border-radius:16px;background:var(--v50);text-align:center}
+        .cifra strong{display:block;font-family:var(--f-titulo);font-weight:600;font-size:1.8rem;line-height:1.1;color:var(--v700)}
+        .cifra span{font-size:.82rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--suave)}
+        .pasos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+        .paso-card{display:flex;gap:14px;padding:16px 18px;border:1px solid var(--borde);border-radius:16px;background:var(--crema)}
+        .paso-card h3{margin:0 0 4px;font-size:1.05rem}
+        .paso-card p{margin:0;font-size:.95rem;color:var(--suave)}
+        .puntos{margin:14px 0 6px;padding:0;list-style:none}
+        .puntos li{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:10px 0;border-bottom:1px dashed var(--borde)}
+        .puntos li:last-child{border-bottom:0}
+        .puntos b{flex:none;font-family:var(--f-titulo);font-weight:600;color:var(--v700);white-space:nowrap}
+        .limites{margin:10px 0 0;padding:0;list-style:none}
+        .limites li{position:relative;padding:8px 0 8px 28px}
+        .limites li::before{content:'•';position:absolute;left:8px;top:8px;color:var(--kraft);font-weight:800}
+        .equipo{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+        .persona{padding:8px 16px;border:1px solid var(--borde);border-radius:999px;background:var(--v50);font-weight:800;color:var(--v900)}
+
+        /* ---------- Pie de página ---------- */
+        .pie{margin-top:44px;padding:30px 0 26px;border-top:1px solid var(--borde);background:var(--papel);color:var(--suave);font-size:.88rem}
+        .pie-in{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:18px}
+        .pie-marca{display:flex;align-items:center;gap:12px}
+        .pie-marca img{width:44px;height:44px;border-radius:50%;display:block}
+        .pie-marca strong{display:block;font-family:var(--f-titulo);font-weight:600;font-size:1.15rem;line-height:1.1;color:var(--v900)}
+        .pie-enlaces{display:flex;flex-wrap:wrap;gap:6px 22px}
+        .pie-enlaces a{font-weight:800;text-decoration:none;color:var(--v700)}
+        .pie-enlaces a:hover{text-decoration:underline}
+        .pie-legal{margin-top:18px;padding-top:16px;border-top:1px dashed var(--borde);text-align:center}
+        .pie-legal p{margin:2px 0}
 
         @media (max-width:640px){
-            .resumen,.grid-prefs{grid-template-columns:1fr}
+            .resumen,.grid-prefs,.pasos{grid-template-columns:1fr}
+            .cifras{grid-template-columns:repeat(2,minmax(0,1fr))}
+            .plato{flex-direction:column;gap:12px}
+            .plato-foto{width:100%}
+            .plato-foto img{aspect-ratio:16/9}
+            .plato-sin-foto{display:none}
+            .pie-in{flex-direction:column;align-items:flex-start}
             .hero{flex-direction:column;align-items:flex-start;padding:22px}
             .hero img{display:none}
             .wrap{padding:0 14px}
@@ -185,8 +230,8 @@
             .marca img{width:42px;height:42px}
             .nombre{font-size:1.2rem}
             .marca small{display:none}
-            nav{gap:2px}
-            nav a{padding:7px 11px;font-size:.9rem}
+            .top nav{gap:2px}
+            .top nav a{padding:7px 11px;font-size:.9rem}
             .acciones{bottom:8px;gap:8px;padding:10px;border-radius:18px}
             .acciones .btn-prim{flex:1 1 100%}
             .acciones .btn-sec,.acciones .btn-out{flex:1 1 calc(50% - 4px);padding:10px 8px;font-size:.92rem}
@@ -220,6 +265,25 @@
         @yield('contenido')
     </main>
 
-    <footer class="pie">ComiBox · Proyecto académico · Laravel + MySQL</footer>
+    <footer class="pie">
+        <div class="wrap pie-in">
+            <div class="pie-marca">
+                <img src="{{ asset('img/logo.png') }}" alt="" width="44" height="44">
+                <div>
+                    <strong>ComiBox</strong>
+                    <span>Comida real, en casa</span>
+                </div>
+            </div>
+            <nav class="pie-enlaces" aria-label="Pie de página">
+                <a href="{{ route('combos.index') }}">Generar</a>
+                <a href="{{ route('combos.historial') }}">Historial</a>
+                <a href="{{ route('acerca') }}">Acerca del proyecto</a>
+            </nav>
+        </div>
+        <div class="wrap pie-legal">
+    
+            <p>© {{ date('Y') }} ComiBox. Recetas adaptadas de recetarios de cocina; costos y tiempos aproximados.</p>
+        </div>
+    </footer>
 </body>
 </html>
